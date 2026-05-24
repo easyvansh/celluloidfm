@@ -15,6 +15,7 @@
 
 CelluloidFM is a cinematic SomaFM web radio player redesigned by **Vansh**. It transforms a classic browser radio app into a black, cover-first listening dashboard with Apple Music-style elegance, Linear-like dark panels, Arc-inspired ambient gradients, MUBI/Letterboxd restraint, mood themes, favorites, station search, recent tracks, YouTube discovery, and a Web Audio powered visualizer.
 
+Live app: https://celluloidfm.vercel.app/
 
 ## What It Does
 
