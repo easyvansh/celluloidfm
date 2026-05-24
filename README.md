@@ -140,6 +140,29 @@ http://localhost:8000
 
 This works because the app is already static and loads the current CelluloidFM CSS override directly from `public/css/nightwave.css`.
 
+## Deploy To Vercel
+
+CelluloidFM should be deployed to Vercel as a static site. The repo includes `vercel.json` so Vercel skips dependency installation and avoids the legacy `node-sass@4` build failure.
+
+Use these Vercel project settings:
+
+```text
+Framework Preset: Other
+Install Command: echo "Skipping dependency install for static deployment"
+Build Command: echo "No build required for CelluloidFM static deployment"
+Output Directory: .
+```
+
+Deployment steps:
+
+1. Commit and push the latest files, including `vercel.json`.
+2. Import `github.com/easyvansh/celluloidfm` in Vercel.
+3. Keep the framework preset as `Other`.
+4. Confirm the commands above are set in Project Settings.
+5. Deploy.
+
+Do not run `npm run build` on Vercel until the legacy build stack is modernized.
+
 ## Legacy Build Commands
 
 Install dependencies:

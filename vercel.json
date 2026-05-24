@@ -1,0 +1,5 @@
+{
+  "installCommand": "echo \"Skipping dependency install for static deployment\"",
+  "buildCommand": "echo \"No build required for CelluloidFM static deployment\"",
+  "outputDirectory": "."
+}
