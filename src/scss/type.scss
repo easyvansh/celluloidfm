@@ -1,15 +1,16 @@
 // headings
 h1, h2, h3, h4, h5, h6 {
   display: block;
+  font-family: $fontHeading;
   font-weight: normal;
-  line-height: 1.2em;
+  line-height: 1.05em;
   color: $colorBright;
 }
-h1 { font-size: 220%; }
-h2 { font-size: 200%; }
+h1 { font-size: 320%; }
+h2 { font-size: 230%; }
 h3 { font-size: 180%; }
 h4 { font-size: 160%; }
-h5 { font-size: 140%; }
+h5 { font-size: 130%; }
 h6 { font-size: 120%; }
 
 // text helpers
@@ -36,3 +37,9 @@ h6 { font-size: 120%; }
 .text-huge { font-size: 240%; }
 .text-small { font-size: 90%; }
 .text-condense { letter-spacing: -1px; }
+.text-kicker {
+  font-family: $fontAccent;
+  font-size: 72%;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}

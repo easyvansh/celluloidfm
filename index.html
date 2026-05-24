@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html class="nojs" lang="en">
   <head>
-    <title>Soma FM Player</title>
+    <title>Nightwave SomaFM Player</title>
 
     <meta charset="UTF-8" />
     <meta http-equiv="x-ua-compatible" content="IE=Edge, chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <meta name="description" id="description" content="SPA audio player for the streaming stations provided by Soma FM." />
+    <meta name="description" id="description" content="A cinematic late-night SomaFM listening experience with favorites, station search, and an audio visualizer." />
     <meta name="author" content="Rainner Lins | @raintek_ | https://rainnerlins.com | https://github.com/rainner" />
 
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="prefetch" href="https://somafm.com/channels.json" />
     <link rel="preconnect" href="https://ice1.somafm.com" />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
 
     <style type="text/css">
       @keyframes _spin { 0% { transform: rotate( 0deg ); } 100% { transform: rotate( 359deg ); } }
-      html, body { margin: 0; padding: 0; position: relative; overflow: hidden; min-height: 100vh; background-color: #8086a0; }
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; }
+      html, body { margin: 0; padding: 0; position: relative; overflow: hidden; min-height: 100vh; background-color: #090909; }
+      body { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
       #_spnr { display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 9999; }
-      #_spnr { text-align: center; font-family: Arial, Helvetica, sans-serif; background-color: #8086a0; color: #1e1f30; }
+      #_spnr { text-align: center; font-family: Inter, Arial, Helvetica, sans-serif; background-color: #090909; color: #f5f1ea; }
       #_spnr svg { display: block; margin: 0; padding: 0; animation: _spin 1s linear infinite; }
       #_spnr noscript { max-width: 500px; }
-      #_spnr a { color: crimson; }
+      #_spnr a { color: #d4a574; }
     </style>
 
     <script>
@@ -38,8 +41,8 @@
     <!-- initial spinner -->
     <div id="_spnr">
       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-ring">
-        <circle cx="50" cy="50" fill="none" r="40" stroke="#8086a0" stroke-width="10"></circle>
-        <circle cx="50" cy="50" fill="none" r="40" stroke="#1e1f30" stroke-width="6" stroke-linecap="round" stroke-dasharray="150 100"></circle>
+        <circle cx="50" cy="50" fill="none" r="40" stroke="#1f1f1f" stroke-width="10"></circle>
+        <circle cx="50" cy="50" fill="none" r="40" stroke="#d4a574" stroke-width="6" stroke-linecap="round" stroke-dasharray="150 100"></circle>
       </svg>
       <noscript>
         This applications requires Javascript to run.
@@ -57,14 +60,15 @@
 
         <!-- bg absolute elements -->
         <figure id="player-bg" class="player-bg" style="background-image: url( public/img/bg.jpg );"></figure>
-        <canvas id="player-canvas" class="player-canvas" width="800" height="400"></canvas>
+        <canvas id="player-canvas" class="player-canvas" width="1000" height="800"></canvas>
 
         <!-- main player layout -->
         <section class="player-layout">
 
           <!-- player top header -->
           <header class="player-header flex-row flex-middle flex-stretch">
-            <h2 class="player-logo text-clip flex-1"><i class="ico ico-waveform"></i> &nbsp; <span>Soma FM Player</span></h2>
+            <h2 class="player-logo text-clip flex-1"><i class="ico ico-waveform"></i> &nbsp; <span>Nightwave</span></h2>
+            <div class="player-header-tag text-kicker if-medium">SomaFM after dark</div>
             <button class="text-nowrap common-btn focus-text" type="button" @click="toggleSidebar( true )" title="Open stations menu"><i class="ico ico-menu"></i></button>
           </header>
 
@@ -73,28 +77,30 @@
 
             <!-- default greet message -->
             <section class="player-greet" v-if="!hasChannel && !hasErrors">
-              <div class="fx fx-slide-left push-bottom"><h1>Pick a Station</h1></div>
-              <div class="fx fx-slide-left fx-delay-1 push-bottom">This is a music streaming player for the channels provided by SomaFM.com. Just pick a station from the sidebar to the right to start listening.</div>
-              <div class="fx fx-slide-up fx-delay-2 pad-top"><button class="cta-btn focus-box" type="button" @click="toggleSidebar( true )"><i class="ico ico-headphones"></i> &nbsp; View Stations</button></div>
+              <div class="text-kicker text-primary fx fx-slide-left push-bottom">Late-night radio room</div>
+              <div class="fx fx-slide-left push-bottom"><h1>Tune into the midnight signal.</h1></div>
+              <div class="player-greet-copy fx fx-slide-left fx-delay-1 push-bottom">Browse SomaFM stations as moods, save the ones that fit, and let the visualizer turn the room into a soft cinematic glow.</div>
+              <div class="fx fx-slide-up fx-delay-2 pad-top"><button class="cta-btn focus-box" type="button" @click="toggleSidebar( true )"><i class="ico ico-headphones"></i> &nbsp; Enter Stations</button></div>
             </section>
 
             <!-- show selected channel info if possible -->
             <section class="player-channel flex-1" v-if="hasChannel && !hasErrors" :key="channel.id">
-              <div class="flex-autorow flex-top flex-stretch">
+              <div class="flex-autorow flex-top flex-stretch nightwave-stage">
 
                 <!-- station details -->
-                <div class="flex-item flex-1">
+                <div class="flex-item flex-1 now-playing-panel">
 
                   <!-- station -->
-                  <div class="push-bottom">
+                  <div class="push-bottom station-hero">
                     <div class="flex-row flex-middle pad-bottom">
                       <div class="fx fx-drop-in fx-delay-1">
-                        <img class="img-round" :src="channel.largeimage" width="80" height="80" :alt="channel.title" />
+                        <img class="img-round station-art" :src="channel.largeimage" width="104" height="104" :alt="channel.title" />
                       </div>
                       <div class="pad-left">
                         <h3 class="text-clip fx fx-fade-in fx-delay-2">
                           <span>{{ channel.title }}</span>
                         </h3>
+                        <div class="text-kicker text-primary fx fx-fade-in fx-delay-2">Now broadcasting</div>
                         <div class="fx fx-fade-in fx-delay-3">
                           <fav-btn :id="channel.id" :active="channel.favorite" text="Favorite" @change="toggleFavorite"></fav-btn>
                         </div>
@@ -140,7 +146,7 @@
                   </div>
 
                   <!-- current track -->
-                  <div class="card fx fx-slide-left fx-delay-4" :key="track.date">
+                  <div class="card track-card fx fx-slide-left fx-delay-4" :key="track.date">
                     <div><span class="text-secondary">{{ track.title | toText( 'N/A' ) }}</span></div>
                     <div><span class="text-faded">From:</span>&nbsp; <span class="text-bright">{{ track.album | toText( 'N/A' ) }}</span></div>
                     <div><span class="text-faded">By:</span>&nbsp; <span class="text-default">{{ track.artist | toText( 'N/A' ) }}</span></div>
@@ -149,7 +155,7 @@
                 </div>
 
                 <!-- songs list -->
-                <div class="flex-item flex-1">
+                <div class="flex-item flex-1 recent-panel">
 
                   <div class="push-bottom">
                     <h5 class="text-nowrap fx fx-fade-in fx-delay-1">
@@ -157,12 +163,12 @@
                     </h5>
                   </div>
 
-                  <div class="card push-bottom fx fx-slide-left fx-delay-4" v-if="!hasSongs">
+                  <div class="card track-card push-bottom fx fx-slide-left fx-delay-4" v-if="!hasSongs">
                     There are no songs loaded yet for this station.
                   </div>
 
                   <ul class="player-tracklist push-bottom" v-if="hasSongs">
-                    <li v-for="( s, i ) of songsList" :key="s.date" class="card fx" :class="'fx-slide-left fx-delay-' + ( i + 4 )">
+                    <li v-for="( s, i ) of songsList" :key="s.date" class="card track-card fx" :class="'fx-slide-left fx-delay-' + ( i + 4 )">
                       <div><span class="text-secondary">{{ s.title | toText( 'N/A' ) }}</span></div>
                       <div><span class="text-faded">From:</span>&nbsp; <span class="text-bright">{{ s.album | toText( 'N/A' ) }}</span></div>
                       <div><span class="text-faded">By:</span>&nbsp; <span class="text-default">{{ s.artist | toText( 'N/A' ) }}</span></div>
@@ -239,7 +245,7 @@
             <header class="player-stations-header flex-row flex-middle flex-stretch">
               <div class="form-input push-right">
                 <i class="ico ico-search"></i>
-                <input type="text" placeholder="Search station..." v-model="searchText" />
+                <input type="text" placeholder="Search the signal..." v-model="searchText" />
               </div>
               <button class="common-btn focus-text" type="button" @click="toggleSidebar( false )" title="Close stations menu"><i class="ico ico-close"></i></button>
             </header>
@@ -248,7 +254,7 @@
             <ul class="player-stations-list">
               <li class="player-stations-list-item flex-row flex-top flex-stretch" tabindex="0" v-for="c of channelsList" :key="c.id" @click="selectChannel( c, true )" :class="{ 'active': c.active }" :title="c.title">
                 <figure class="push-right">
-                  <img class="img-round" width="70" height="70" :src="c.largeimage" :alt="c.title" />
+                  <img class="img-round station-card-img" width="78" height="78" :src="c.largeimage" :alt="c.title" />
                 </figure>
                 <aside class="flex-1">
                   <div class="flex-row flex-middle flex-space">
@@ -259,7 +265,7 @@
                     </div>
                   </div>
                   <div class="text-small">
-                    <span class="text-faded text-uppercase text-small">{{ c.genre | toText }}</span> <br />
+                    <span class="text-kicker text-primary">{{ c.genre | toText }}</span> <br />
                     {{ c.description }}
                   </div>
                 </aside>
@@ -298,6 +304,7 @@
     <!-- app styles -->
     <link rel="stylesheet" href="/public/css/fonts.css" />
     <link rel="stylesheet" href="/public/bundles/app.min.css" />
+    <link rel="stylesheet" href="/public/css/nightwave.css" />
 
     <!-- app scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js" defer></script>

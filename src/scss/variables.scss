@@ -4,54 +4,58 @@ $padSmall: $padSpace / 2;
 $headerHeight: 3.6em;
 
 // document colors
-$colorDocument: #8086a0;
-$colorDocumentDark: #1e1f30;
-$colorDocumentDarker: darken( $colorDocumentDark, 10% );
-$colorDocumentLight: #a0a6b0;
-$colorDocumentText: desaturate( lighten( $colorDocumentDark, 40% ), 5% );
+$colorDocument: #090909;
+$colorDocumentDark: #111111;
+$colorDocumentDarker: darken( $colorDocumentDark, 7% );
+$colorDocumentLight: #f5f1ea;
+$colorDocumentText: #d8d2c8;
 
 // common colors
-$colorPrimary: crimson;
-$colorPrimaryText: lighten( $colorPrimary, 40% );
-$colorSecondary: cornflowerblue;
-$colorSecondaryText: darken( $colorSecondary, 40% );
-$colorDefault: lightslategray;
-$colorDefaultText: darken( $colorDefault, 40% );
-$colorGrey: slategray;
-$colorGreyText: darken( $colorGrey, 40% );
-$colorBright: whitesmoke;
-$colorBrightText: darken( $colorBright, 40% );
-$colorOverlay: rgba( black, 0.4 );
-$colorCard: rgba( black, 0.2 );
+$colorPrimary: #d4a574;
+$colorPrimaryText: #fff6e8;
+$colorSecondary: #ff5e5e;
+$colorSecondaryText: #2a0d0d;
+$colorDefault: #8b8b8b;
+$colorDefaultText: #f5f1ea;
+$colorGrey: #8b8b8b;
+$colorGreyText: #f5f1ea;
+$colorBright: #f5f1ea;
+$colorBrightText: #090909;
+$colorOverlay: rgba( 0, 0, 0, 0.72 );
+$colorCard: rgba( 17, 17, 17, 0.68 );
+$colorPanel: #111111;
+$colorBorder: #1f1f1f;
 
 // scrollbar colors
-$scrollTrack: darken( $colorDocumentDark, 4% );
-$scrollThumb: lighten( $colorDocumentDark, 12% );
+$scrollTrack: #0d0d0d;
+$scrollThumb: #2a241f;
 
 // borders and lines
 $lineWidth: 2px;
 $lineStyle: solid;
-$lineColor: rgba( black, 0.08 );
+$lineColor: $colorBorder;
 $lineJoin: 6px;
 
 // base font options
-$fontFamily: 'Assistant', sans-serif;
+$fontFamily: 'Inter', 'Assistant', sans-serif;
+$fontHeading: 'Cormorant Garamond', Georgia, serif;
+$fontAccent: 'Space Grotesk', 'Inter', sans-serif;
 $fontSize: 18px;
 $fontSpace: 1.4em;
-$fontWeight: 700;
+$fontWeight: 500;
 
 // focus effects
-$focusText: 0 0 12px rgba( darkorange, .5 );
-$focusBox: 0 0 12px rgba( darkorange, .5 );
+$focusText: 0 0 16px rgba( $colorPrimary, .55 );
+$focusBox: 0 0 0 1px rgba( $colorPrimary, .55 ), 0 0 22px rgba( $colorPrimary, .22 );
 
 // shadow styles
-$shadowContainer: 0 1px 30px rgba( black, 0.8 );
-$shadowOverlay: 0 1px 20px rgba( black, 0.6 );
-$shadowPaper: 0 1px 3px rgba( black, 0.5 );
+$shadowContainer: 0 30px 100px rgba( black, 0.82 );
+$shadowOverlay: 0 24px 80px rgba( black, 0.75 );
+$shadowPaper: 0 18px 45px rgba( black, 0.34 );
 
 // transition props
-$fxSpeed: 400ms;
-$fxEase: cubic-bezier( 0.215, 0.610, 0.355, 1.000 );
+$fxSpeed: 520ms;
+$fxEase: cubic-bezier( 0.19, 1, 0.22, 1 );
 $fxSpeedOffset: calc( #{$fxSpeed} / 3 );
 $fxSlideDist: 50px;
 $fxShrinkScale: .4;

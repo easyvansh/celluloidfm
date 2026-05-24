@@ -9,7 +9,8 @@
   color: $colorBright;
 
   &:hover {
-    color: darken( $colorBright, 20% );
+    color: $colorPrimary;
+    text-shadow: 0 0 18px rgba( $colorPrimary, .35 );
   }
 }
 
@@ -17,15 +18,21 @@
 .cta-btn {
   display: inline-block;
   text-decoration: none;
-  padding: ( $padSpace / 2 ) $padSpace;
+  padding: .72em 1.1em;
   color: $colorPrimaryText;
-  background-color: darken( desaturate( $colorPrimary, 10% ), 10% );
+  background:
+    linear-gradient( 135deg, rgba( $colorPrimary, .95 ), rgba( $colorSecondary, .62 ) );
   border-radius: 100px;
+  box-shadow: 0 14px 34px rgba( black, .28 ), 0 0 24px rgba( $colorPrimary, .12 );
+  font-family: $fontAccent;
+  font-size: 86%;
   line-height: 1.1em;
+  text-transform: uppercase;
 
   &:hover {
-    color: lighten( $colorPrimaryText, 5% );
-    background-color: darken( $colorPrimary, 5% );
+    color: white;
+    transform: translateY( -1px );
+    box-shadow: 0 18px 45px rgba( black, .34 ), 0 0 30px rgba( $colorPrimary, .24 );
   }
 }
 
@@ -37,6 +44,10 @@
   align-items: center;
   justify-content: stretch;
   color: $colorBright;
+  background-color: rgba( white, .04 );
+  border: 1px solid rgba( $colorBright, .08 );
+  border-radius: 999px;
+  padding: .35em .8em;
 
   & > input {
     flex: 1;
@@ -49,7 +60,7 @@
 @mixin sliderTrack {
   width: 100%;
   height: 3px;
-  background-color: lighten( $colorDocumentDark, 10% );
+  background-color: rgba( $colorBright, .12 );
   color: transparent !important;
   border-color: transparent !important;
   border-radius: $lineJoin !important;
@@ -61,14 +72,14 @@
   margin: -.4em 0 0 0;
   border-radius: 50%;
   box-shadow: $shadowPaper;
-  background-color: $colorBright !important;;
+  background-color: $colorPrimary !important;
   transition: background $fxSpeed $fxEase;
   color: transparent !important;
   border-color: transparent !important;
   border: 0 !important;
   cursor: pointer;
   &:hover {
-    background-color: darken( $colorBright, 20% );
+    background-color: lighten( $colorPrimary, 8% );
   }
   &:focus, &:active {
     box-shadow: $focusBox;
