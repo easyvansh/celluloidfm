@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html class="nojs" lang="en">
   <head>
-    <title>Nightwave SomaFM Player</title>
+    <title>CelluloidFM SomaFM Player</title>
 
     <meta charset="UTF-8" />
     <meta http-equiv="x-ua-compatible" content="IE=Edge, chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <meta name="description" id="description" content="A cinematic late-night SomaFM listening experience with favorites, station search, and an audio visualizer." />
+    <meta name="description" id="description" content="A cinematic SomaFM radio player with a huge now-playing cover, station discovery, favorites, track info, and an audio visualizer." />
     <meta name="author" content="Rainner Lins | @raintek_ | https://rainnerlins.com | https://github.com/rainner" />
 
     <link rel="shortcut icon" href="favicon.ico" />
@@ -25,13 +25,34 @@
       #_spnr { text-align: center; font-family: Inter, Arial, Helvetica, sans-serif; background-color: #090909; color: #f5f1ea; }
       #_spnr svg { display: block; margin: 0; padding: 0; animation: _spin 1s linear infinite; }
       #_spnr noscript { max-width: 500px; }
-      #_spnr a { color: #d4a574; }
+      #_spnr a { color: #c084fc; }
     </style>
 
     <script>
       (function( w ) {
         document.documentElement.classList.remove( 'nojs' );
         w.addEventListener( 'pageshow', e => { if ( e.persisted ) w.location.reload(); } );
+        w.setCelluloidMood = function( mood ) {
+          var player = document.getElementById( 'player-wrap' );
+          if ( !player ) return;
+          var moods = [ 'night-drive', 'deep-focus', 'lounge', 'ambient', 'weird-internet' ];
+          player.classList.remove.apply( player.classList, moods.map( function( m ) { return 'theme-' + m; } ) );
+          if ( moods.indexOf( mood ) >= 0 ) {
+            player.classList.add( 'theme-' + mood );
+            try { w.localStorage.setItem( 'celluloid_mood', mood ); } catch ( e ) {}
+          }
+          var buttons = document.querySelectorAll( '[data-mood]' );
+          for ( var i = 0; i < buttons.length; i++ ) {
+            var active = buttons[ i ].getAttribute( 'data-mood' ) === mood;
+            buttons[ i ].classList.toggle( 'active', active );
+            buttons[ i ].setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+          }
+        };
+        w.addEventListener( 'DOMContentLoaded', function() {
+          var mood = 'night-drive';
+          try { mood = w.localStorage.getItem( 'celluloid_mood' ) || mood; } catch ( e ) {}
+          w.setCelluloidMood( mood );
+        });
       })( window );
     </script>
 
@@ -42,7 +63,7 @@
     <div id="_spnr">
       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-ring">
         <circle cx="50" cy="50" fill="none" r="40" stroke="#1f1f1f" stroke-width="10"></circle>
-        <circle cx="50" cy="50" fill="none" r="40" stroke="#d4a574" stroke-width="6" stroke-linecap="round" stroke-dasharray="150 100"></circle>
+        <circle cx="50" cy="50" fill="none" r="40" stroke="#c084fc" stroke-width="6" stroke-linecap="round" stroke-dasharray="150 100"></circle>
       </svg>
       <noscript>
         This applications requires Javascript to run.
@@ -56,7 +77,7 @@
     <div id="app" class="app-wrap">
 
       <!-- app player container -->
-      <main id="player-wrap" class="player-wrap" style="opacity: 0;">
+      <main id="player-wrap" class="player-wrap theme-night-drive" style="opacity: 0;">
 
         <!-- bg absolute elements -->
         <figure id="player-bg" class="player-bg" style="background-image: url( public/img/bg.jpg );"></figure>
@@ -65,123 +86,51 @@
         <!-- main player layout -->
         <section class="player-layout">
 
-          <!-- player top header -->
-          <header class="player-header flex-row flex-middle flex-stretch">
-            <h2 class="player-logo text-clip flex-1"><i class="ico ico-waveform"></i> &nbsp; <span>Nightwave</span></h2>
-            <div class="player-header-tag text-kicker if-medium">SomaFM after dark</div>
-            <button class="text-nowrap common-btn focus-text" type="button" @click="toggleSidebar( true )" title="Open stations menu"><i class="ico ico-menu"></i></button>
-          </header>
-
-          <!-- player middle content area -->
-          <main class="player-content flex-row">
-
-            <!-- default greet message -->
-            <section class="player-greet" v-if="!hasChannel && !hasErrors">
-              <div class="text-kicker text-primary fx fx-slide-left push-bottom">Late-night radio room</div>
-              <div class="fx fx-slide-left push-bottom"><h1>Tune into the midnight signal.</h1></div>
-              <div class="player-greet-copy fx fx-slide-left fx-delay-1 push-bottom">Browse SomaFM stations as moods, save the ones that fit, and let the visualizer turn the room into a soft cinematic glow.</div>
-              <div class="fx fx-slide-up fx-delay-2 pad-top"><button class="cta-btn focus-box" type="button" @click="toggleSidebar( true )"><i class="ico ico-headphones"></i> &nbsp; Enter Stations</button></div>
-            </section>
-
-            <!-- show selected channel info if possible -->
-            <section class="player-channel flex-1" v-if="hasChannel && !hasErrors" :key="channel.id">
-              <div class="flex-autorow flex-top flex-stretch nightwave-stage">
-
-                <!-- station details -->
-                <div class="flex-item flex-1 now-playing-panel">
-
-                  <!-- station -->
-                  <div class="push-bottom station-hero">
-                    <div class="flex-row flex-middle pad-bottom">
-                      <div class="fx fx-drop-in fx-delay-1">
-                        <img class="img-round station-art" :src="channel.largeimage" width="104" height="104" :alt="channel.title" />
-                      </div>
-                      <div class="pad-left">
-                        <h3 class="text-clip fx fx-fade-in fx-delay-2">
-                          <span>{{ channel.title }}</span>
-                        </h3>
-                        <div class="text-kicker text-primary fx fx-fade-in fx-delay-2">Now broadcasting</div>
-                        <div class="fx fx-fade-in fx-delay-3">
-                          <fav-btn :id="channel.id" :active="channel.favorite" text="Favorite" @change="toggleFavorite"></fav-btn>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- description -->
-                  <div class="push-bottom pad-bottom fx fx-slide-up fx-delay-3">
-                    <div class="push-bottom">
-                      <span class="text-secondary">Mixed by DJ {{ channel.dj | toText( 'N/A' ) }}.</span> <br />
-                      <span class="text-bright text-capitalize">{{ channel.title }}</span> -
-                      <span class="text-bright text-capitalize">{{ channel.genre | toText( 'Station' ) }}.</span> <br />
-                      <span>{{ channel.description }}</span>
-                    </div>
-                    <div class="flex-row flex-middle">
-                      <div class="fx fx-slide-up fx-delay-2 push-right" v-if="channel.infourl">
-                        <a class="cta-btn text-nowrap focus-box" :href="channel.infourl" title="Channel page" target="_blank">
-                          <i class="ico ico-earth"></i>&nbsp; Webpage
-                        </a>
-                      </div>
-                      <div class="fx fx-slide-up fx-delay-3 push-right" v-if="channel.plsfile">
-                        <a class="cta-btn text-nowrap focus-box" :href="channel.plsfile" title="Download PLS" target="_blank">
-                          <i class="ico ico-download"></i>&nbsp; PLS
-                        </a>
-                      </div>
-                      <div class="fx fx-slide-up fx-delay-4 push-right" v-if="channel.twitter">
-                        <a class="cta-btn text-nowrap focus-box" :href="channel.twitter" title="Twitter page" target="_blank">
-                          <i class="ico ico-twitter"></i>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- heading -->
-                  <div class="flex-row flex-middle push-bottom">
-                    <div class="push-right">
-                      <h5 class="text-nowrap fx fx-fade-in fx-delay-2"><i class="ico ico-playing"></i>&nbsp; Now Playing</h5>
-                    </div>
-                    <div class="fx fx-slide-left fx-delay-3" :key="channel.listeners">
-                      <i class="ico ico-headphones"></i>&nbsp; {{ channel.listeners | toCommas( 0 ) }} listening
-                    </div>
-                  </div>
-
-                  <!-- current track -->
-                  <div class="card track-card fx fx-slide-left fx-delay-4" :key="track.date">
-                    <div><span class="text-secondary">{{ track.title | toText( 'N/A' ) }}</span></div>
-                    <div><span class="text-faded">From:</span>&nbsp; <span class="text-bright">{{ track.album | toText( 'N/A' ) }}</span></div>
-                    <div><span class="text-faded">By:</span>&nbsp; <span class="text-default">{{ track.artist | toText( 'N/A' ) }}</span></div>
-                  </div>
-
-                </div>
-
-                <!-- songs list -->
-                <div class="flex-item flex-1 recent-panel">
-
-                  <div class="push-bottom">
-                    <h5 class="text-nowrap fx fx-fade-in fx-delay-1">
-                      <i class="ico ico-collection"></i>&nbsp; Recent Tracks
-                    </h5>
-                  </div>
-
-                  <div class="card track-card push-bottom fx fx-slide-left fx-delay-4" v-if="!hasSongs">
-                    There are no songs loaded yet for this station.
-                  </div>
-
-                  <ul class="player-tracklist push-bottom" v-if="hasSongs">
-                    <li v-for="( s, i ) of songsList" :key="s.date" class="card track-card fx" :class="'fx-slide-left fx-delay-' + ( i + 4 )">
-                      <div><span class="text-secondary">{{ s.title | toText( 'N/A' ) }}</span></div>
-                      <div><span class="text-faded">From:</span>&nbsp; <span class="text-bright">{{ s.album | toText( 'N/A' ) }}</span></div>
-                      <div><span class="text-faded">By:</span>&nbsp; <span class="text-default">{{ s.artist | toText( 'N/A' ) }}</span></div>
-                    </li>
-                  </ul>
-
-                </div>
-
+          <!-- persistent left navigation -->
+          <aside class="app-sidebar">
+            <div class="brand-lockup">
+              <div class="brand-mark"><i class="ico ico-waveform"></i></div>
+              <div>
+                <h1 class="brand-name">CelluloidFM</h1>
+                <div class="brand-kicker">Cinematic radio</div>
               </div>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Primary">
+              <button class="sidebar-nav-item active" type="button" @click="searchText = ''; sortBy( 'listeners', 'desc' )">
+                <i class="ico ico-house"></i><span>Home</span>
+              </button>
+              <button class="sidebar-nav-item" type="button" @click="searchText = ''">
+                <i class="ico ico-search"></i><span>Discover</span>
+              </button>
+              <button class="sidebar-nav-item" type="button" @click="sortBy( 'favorite', 'desc' )">
+                <i class="ico ico-favs-check"></i><span>Favorites</span>
+              </button>
+              <button class="sidebar-nav-item" type="button" @click="sortBy( 'genre', 'asc' )">
+                <i class="ico ico-collection"></i><span>Genres</span>
+              </button>
+            </nav>
+
+            <section class="sidebar-moods" aria-label="Moods">
+              <div class="sidebar-label">Moods</div>
+              <button type="button" data-mood="night-drive" aria-pressed="true" @click="searchText = 'night'; window.setCelluloidMood( 'night-drive' )">Night Drive</button>
+              <button type="button" data-mood="deep-focus" aria-pressed="false" @click="searchText = 'ambient'; window.setCelluloidMood( 'deep-focus' )">Deep Focus</button>
+              <button type="button" data-mood="lounge" aria-pressed="false" @click="searchText = 'lounge'; window.setCelluloidMood( 'lounge' )">Lounge</button>
+              <button type="button" data-mood="ambient" aria-pressed="false" @click="searchText = 'space'; window.setCelluloidMood( 'ambient' )">Ambient</button>
+              <button type="button" data-mood="weird-internet" aria-pressed="false" @click="searchText = 'weird'; window.setCelluloidMood( 'weird-internet' )">Weird Internet</button>
             </section>
+
+            <div class="sidebar-stat">
+              <span class="stat-number">{{ channels.length | toCommas( 0 ) }}</span>
+              <span class="stat-label">live stations</span>
+            </div>
+          </aside>
+
+          <!-- dashboard content -->
+          <main class="dashboard-main">
 
             <!-- show error messages -->
-            <section class="player-errors flex-1 text-center" v-if="hasErrors" key="errors">
+            <section class="player-errors dashboard-error text-center" v-if="hasErrors" key="errors">
               <div class="push-bottom fx fx-drop-in fx-delay-1">
                 <i class="ico ico-unplugged text-huge"></i>
               </div>
@@ -198,19 +147,157 @@
               </button>
             </section>
 
+            <section class="dashboard-content" v-if="!hasErrors">
+              <header class="dashboard-header">
+                <div>
+                  <div class="text-kicker text-primary">Now showing</div>
+                  <h2>Listen in full frame.</h2>
+                </div>
+
+                <div class="dashboard-tools">
+                  <div class="form-input station-search">
+                    <i class="ico ico-search"></i>
+                    <input id="station-search" type="text" placeholder="Search stations..." v-model="searchText" />
+                  </div>
+                  <button type="button" class="sort-chip" @click="toggleSortOrder()" :title="'Sort ' + sortOrder">
+                    <i class="ico" :class="{ 'ico-sort-desc': sortOrder === 'desc', 'ico-sort-asc': sortOrder === 'asc' }"></i>
+                  </button>
+                  <span class="sort-chip popover">
+                    <span>{{ sortLabel }}</span>
+                    <span class="popover-box popover-top">
+                      <button type="button" @click="sortBy( 'title', 'asc' )"><i class="text-faded ico ico-sort-asc"></i> &nbsp; Station Name</button>
+                      <button type="button" @click="sortBy( 'listeners', 'desc' )"><i class="text-faded ico ico-headphones"></i> &nbsp; Listeners Count</button>
+                      <button type="button" @click="sortBy( 'favorite', 'desc' )"><i class="text-faded ico ico-favs-check"></i> &nbsp; Saved Favorites</button>
+                      <button type="button" @click="sortBy( 'genre', 'asc' )"><i class="text-faded ico ico-collection"></i> &nbsp; Music Genre</button>
+                    </span>
+                  </span>
+                </div>
+              </header>
+
+              <section class="cinema-stage">
+                <section class="now-playing-panel" v-if="hasChannel" :key="channel.id">
+                  <div class="cover-hero">
+                    <figure class="station-artwork-wrap">
+                      <img class="station-artwork-main" :src="channel.largeimage" width="380" height="380" :alt="channel.title" />
+                    </figure>
+
+                    <div class="hero-copy">
+                      <div class="text-kicker text-primary">Now playing</div>
+                      <h3>{{ channel.title }}</h3>
+                      <p class="hero-track">{{ track.title | toText( 'Live SomaFM stream' ) }}</p>
+                      <p class="hero-meta">
+                        <span>{{ track.artist | toText( channel.genre ) }}</span>
+                        <span v-if="track.album">&nbsp;/&nbsp;{{ track.album }}</span>
+                      </p>
+                      <p class="hero-station-meta">
+                        DJ {{ channel.dj | toText( 'N/A' ) }} · {{ channel.genre | toText( 'Station' ) }} · {{ channel.listeners | toCommas( 0 ) }} listening
+                      </p>
+
+                      <div class="module-actions">
+                        <fav-btn :id="channel.id" :active="channel.favorite" text="Favorite" @change="toggleFavorite"></fav-btn>
+                        <a class="action-button" v-if="channel.infourl" :href="channel.infourl" title="Channel page" target="_blank" rel="noopener">
+                          <i class="ico ico-earth"></i>&nbsp; Webpage
+                        </a>
+                        <a class="action-button" v-if="channel.plsfile" :href="channel.plsfile" title="Download PLS" target="_blank" rel="noopener">
+                          <i class="ico ico-download"></i>&nbsp; PLS
+                        </a>
+                        <a class="action-button youtube-link" v-if="track.title || track.artist" :href="'https://www.youtube.com/results?search_query=' + encodeURIComponent((track.title || '') + ' ' + (track.artist || ''))" title="Search this track on YouTube" target="_blank" rel="noopener">
+                          <i class="ico ico-playing"></i>&nbsp; Search on YouTube
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="now-playing-panel empty-module" v-if="!hasChannel">
+                  <div class="empty-copy">
+                    <div class="text-kicker text-primary">CelluloidFM</div>
+                    <h3>Choose a station to start listening.</h3>
+                    <p>Search the catalog, sort by listeners or genre, save favorites, and keep playback docked in the bottom bar.</p>
+                  </div>
+                </section>
+
+                <aside class="right-rail">
+                  <section class="rail-panel">
+                    <h5><i class="ico ico-collection"></i>&nbsp; Recent Tracks</h5>
+                    <div class="mini-track" v-if="!hasSongs">There are no songs loaded yet for this station.</div>
+                    <div class="mini-track" v-for="s of songsList" :key="s.date">
+                      <div class="text-clip">{{ s.title | toText( 'N/A' ) }}</div>
+                      <span class="text-clip">{{ s.artist | toText( 'N/A' ) }}</span>
+                    </div>
+                  </section>
+
+                  <section class="rail-panel station-info-panel" v-if="hasChannel">
+                    <h5><i class="ico ico-waveform"></i>&nbsp; Station Info</h5>
+                    <p>{{ channel.description }}</p>
+                    <div class="rail-stat">
+                      <span>{{ channel.genre | toText( 'Station' ) }}</span>
+                      <strong>{{ channel.listeners | toCommas( 0 ) }}</strong>
+                    </div>
+                  </section>
+                </aside>
+              </section>
+
+              <section class="station-discovery">
+                <div class="section-heading">
+                  <div>
+                    <div class="text-kicker text-primary">Stations</div>
+                    <h4>Browse the catalog</h4>
+                  </div>
+                </div>
+
+                <section class="station-grid" aria-label="Station list">
+                  <article class="station-card" tabindex="0" v-for="( c, i ) of channelsList" :key="c.id" @click="selectChannel( c, true )" :class="{ 'active': c.active, 'featured-station': i === 0 }" :title="c.title">
+                    <figure>
+                      <img class="station-card-art" width="160" height="160" :src="c.largeimage" :alt="c.title" />
+                      <span class="station-play-badge">
+                        <i class="ico ico-play"></i>
+                      </span>
+                    </figure>
+                    <div class="station-card-body">
+                      <div class="featured-label" v-if="i === 0">Featured Station</div>
+                      <div class="station-card-title text-clip">{{ c.title }}</div>
+                      <div class="station-card-genre text-clip">{{ c.genre | toText( 'Station' ) }}</div>
+                      <div class="station-card-meta">
+                        <span><i class="ico ico-headphones"></i>&nbsp; {{ c.listeners | toCommas( 0 ) }}</span>
+                        <fav-btn :id="c.id" :active="c.favorite" @change="toggleFavorite"></fav-btn>
+                      </div>
+                    </div>
+                  </article>
+                </section>
+              </section>
+            </section>
+
           </main>
 
-          <!-- player footer with controls -->
-          <footer class="player-footer flex-row flex-middle flex-space">
+          <!-- cinematic persistent player -->
+          <footer class="bottom-player">
+            <section class="bottom-now">
+              <img v-if="hasChannel" class="bottom-art" width="56" height="56" :src="channel.largeimage" :alt="channel.title" />
+              <div v-else class="bottom-art bottom-art-placeholder"><i class="ico ico-waveform"></i></div>
+              <div class="text-clip">
+                <div class="bottom-title text-clip" v-if="hasChannel">{{ channel.title }}</div>
+                <div class="bottom-title text-clip" v-else>CelluloidFM</div>
+                <div class="bottom-subtitle text-clip" v-if="hasChannel">{{ track.title | toText( channel.genre ) }}</div>
+                <div class="bottom-subtitle text-clip" v-else>Select a station</div>
+              </div>
+            </section>
 
-            <!-- player controls -->
-            <section class="player-controls flex-row flex-middle push-right" :class="{ 'disabled': !canPlay }">
-              <button class="common-btn focus-text" type="button" @click="togglePlay">
+            <section class="player-controls bottom-controls" :class="{ 'disabled': !canPlay }">
+              <button class="common-btn focus-text" type="button" @click="togglePlay" title="Play or stop">
                 <i v-if="loading" class="ico ico-loader fx fx-spin-right" key="wait"></i>
                 <i v-else-if="playing" class="ico ico-stop fx fx-drop-in" key="stop"></i>
                 <i v-else class="ico ico-play fx fx-drop-in" key="play"></i>
               </button>
-              <div class="form-slider push-left">
+              <div class="bottom-time">{{ timeDisplay }}</div>
+            </section>
+
+            <section class="bottom-tools">
+              <fav-btn v-if="hasChannel" :id="channel.id" :active="channel.favorite" @change="toggleFavorite"></fav-btn>
+              <button type="button" class="download-favs" @click.stop="saveFavorites()" title="Download Favorites PLS">
+                <i class="ico ico-download"></i>
+              </button>
+              <div class="form-slider">
                 <span>
                   <i v-if="volume >= 75" class="ico ico-volume-4"></i>
                   <i v-else-if="volume >= 50" class="ico ico-volume-3"></i>
@@ -219,83 +306,13 @@
                 </span>
                 <input class="common-slider" type="range" min="0" max="100" step="1" value="100" v-model="volume" @change="saveVolume()" />
               </div>
-              <div class="text-clip push-left">
-                <span>{{ timeDisplay }}</span>
-                <span class="text-faded" v-if="hasChannel">&nbsp;|&nbsp;</span>
-                <span class="fx fx-fade-in fx-delay-1" v-if="hasChannel" :key="channel.id">{{ channel.title }}</span>
-              </div>
             </section>
-
-            <!-- player links -->
-            <section class="player-links text-nowrap">
-              <a class="common-btn text-faded focus-text" href="https://github.com/rainner" title="Github profile" target="_blank">
-                <i class="ico ico-github"></i>
-              </a>
-            </section>
-
           </footer>
 
         </section> <!-- layout wrapper -->
 
         <!-- player stations overlay + sidebar -->
-        <section class="player-stations" :class="{ 'active': sbActive, 'visible': sbVisible }" @click="toggleSidebar( false )" tabindex="-1" ref="sidebarDrawer">
-          <aside class="player-stations-sidebar" @click.stop>
-
-            <!-- sidebar search -->
-            <header class="player-stations-header flex-row flex-middle flex-stretch">
-              <div class="form-input push-right">
-                <i class="ico ico-search"></i>
-                <input type="text" placeholder="Search the signal..." v-model="searchText" />
-              </div>
-              <button class="common-btn focus-text" type="button" @click="toggleSidebar( false )" title="Close stations menu"><i class="ico ico-close"></i></button>
-            </header>
-
-            <!-- sidebar stations list -->
-            <ul class="player-stations-list">
-              <li class="player-stations-list-item flex-row flex-top flex-stretch" tabindex="0" v-for="c of channelsList" :key="c.id" @click="selectChannel( c, true )" :class="{ 'active': c.active }" :title="c.title">
-                <figure class="push-right">
-                  <img class="img-round station-card-img" width="78" height="78" :src="c.largeimage" :alt="c.title" />
-                </figure>
-                <aside class="flex-1">
-                  <div class="flex-row flex-middle flex-space">
-                    <div class="player-stations-list-title text-bright text-clip">{{ c.title }}</div>
-                    <div class="text-nowrap">
-                      <span class="text-secondary"><i class="ico ico-headphones"></i>&nbsp; {{ c.listeners | toCommas( 0 ) }} &nbsp;</span>
-                      <fav-btn :id="c.id" :active="c.favorite" @change="toggleFavorite"></fav-btn>
-                    </div>
-                  </div>
-                  <div class="text-small">
-                    <span class="text-kicker text-primary">{{ c.genre | toText }}</span> <br />
-                    {{ c.description }}
-                  </div>
-                </aside>
-              </li>
-            </ul>
-
-            <!-- sidebar sort options -->
-            <footer class="player-stations-footer flex-row flex-middle flex-stretch">
-              <div class="flex-1 push-right">
-                <span @click="toggleSortOrder()" class="ico clickable" :class="{ 'ico-sort-desc': sortOrder === 'desc', 'ico-sort-asc': sortOrder === 'asc' }">&nbsp;</span>
-                <span class="text-faded">Sort: &nbsp;</span>
-                <span class="text-bright popover">
-                  <span class="clickable">{{ sortLabel }}</span>
-                  <span class="popover-box popover-top">
-                    <button type="button" @click="sortBy( 'title', 'asc' )"><i class="text-faded ico ico-sort-asc"></i> &nbsp; Station Name</button>
-                    <button type="button" @click="sortBy( 'listeners', 'desc' )"><i class="text-faded ico ico-headphones"></i> &nbsp; Listeners Count</button>
-                    <button type="button" @click="sortBy( 'favorite', 'desc' )"><i class="text-faded ico ico-favs-check"></i> &nbsp; Saved Favorites</button>
-                    <button type="button" @click="sortBy( 'genre', 'asc' )"><i class="text-faded ico ico-collection"></i> &nbsp; Music Genre</button>
-                  </span>
-                </span>
-              </div>
-              <div>
-                <button type="button" @click.stop="saveFavorites()" title="Download Favorites PLS">
-                  <i class="ico ico-download"></i>
-                </button>
-              </div>
-            </footer>
-
-          </aside>
-        </section>
+        <section class="player-stations legacy-drawer-ref" tabindex="-1" ref="sidebarDrawer"></section>
 
       </main> <!-- player -->
 

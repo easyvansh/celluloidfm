@@ -11,11 +11,10 @@
 
 ![CelluloidFM preview](thumb.png)
 
-CelluloidFM is a cinematic SomaFM web radio player redesigned by **Vansh**. It transforms a classic browser radio app into a late-night listening room with dark film-inspired visuals, warm projector-gold accents, editorial typography, atmospheric station cards, favorites, station search, recently played tracks, and a Web Audio powered visualizer.
+![CelluloidFM preview](thumb2.png)
 
-The project is based on the original MIT-licensed [SomaFM Music Player][original] by Rainner Lins, with a new Nightwave visual direction and project identity.
+CelluloidFM is a cinematic SomaFM web radio player redesigned by **Vansh**. It transforms a classic browser radio app into a black, cover-first listening dashboard with Apple Music-style elegance, Linear-like dark panels, Arc-inspired ambient gradients, MUBI/Letterboxd restraint, mood themes, favorites, station search, recent tracks, YouTube discovery, and a Web Audio powered visualizer.
 
-Repository: [github.com/easyvansh/celluloidfm][repo]
 
 ## What It Does
 
@@ -28,29 +27,61 @@ Repository: [github.com/easyvansh/celluloidfm][repo]
 - Exports favorites as an `.m3u` playlist.
 - Supports station deep links such as `#/channel/groovesalad`.
 - Renders a Three.js audio visualizer using browser audio frequency data.
-- Adds a Nightwave UI layer with glass panels, cinematic spacing, glow states, and modern typography.
+- Adds a cinematic CelluloidFM UI layer with a huge centered station cover, right-side track rail, curated station wall, premium bottom player, ambient theme lighting, and modern typography.
+- Includes mood buttons that change the app theme and optionally search matching stations.
+- Adds a YouTube search link for the current track when metadata is available.
 
 ## Design Direction
 
-CelluloidFM uses a **Nightwave** theme: a cinematic late-night radio room inspired by rainy city windows, CRT glow, noir interiors, deep work playlists, and old film UI.
+CelluloidFM uses a **Cinematic Violet + Projector Amber** identity: black panels, media-first cover art, violet/amber ambient lighting, restrained typography, and curated station cards. The goal is not to clone Spotify. The visual reference is closer to Apple Music's elegance, Linear's dark panels, Arc's ambient gradients, Letterboxd's media identity, and MUBI's restraint.
 
 Core palette:
 
 ```scss
-$bg: #090909;
-$panel: #111111;
-$text: #f5f1ea;
-$muted: #8b8b8b;
-$accent: #d4a574;
-$accent2: #ff5e5e;
-$border: #1f1f1f;
+$bg: #050507;
+$panel: #0d0d11;
+$panelSoft: #111116;
+$card: #17171d;
+$cardHover: #202028;
+$text: #f4f1ea;
+$muted: #a7a29a;
+$accent: #c084fc;   // cinematic violet
+$accent2: #f97316;  // projector amber
+$accent3: #ef4444;  // soft red
+$border: rgba(255, 255, 255, 0.08);
 ```
 
 Typography:
 
-- Headings: Cormorant Garamond
 - UI/body: Inter
 - Accent labels: Space Grotesk
+- Legacy serif heading font remains loaded, but the current interface uses bold Inter for a sharper product UI.
+
+## UI Highlights
+
+- Huge centered station-art now-playing module.
+- Current song, artist, album, station info, listener count, and actions in the hero area.
+- YouTube search action for the current track.
+- SomaFM page and PLS actions.
+- Right rail for recent tracks and station details.
+- Curated station wall with one larger featured station card.
+- Smaller station cards with hover lift and play affordance.
+- Active station glow.
+- Persistent premium bottom player with larger play control and volume/favorite/export actions.
+- Sidebar navigation with Home, Discover, Favorites, and Genres.
+- Mood theme section with Night Drive, Deep Focus, Lounge, Ambient, and Weird Internet.
+
+## Mood Themes
+
+Mood buttons change the app's visual theme, not just station search. The selected mood is applied as a class on `#player-wrap` and saved in `localStorage`.
+
+| Mood | Intent | Theme Direction |
+| --- | --- | --- |
+| Night Drive | Default cinematic mode | Violet + amber, high contrast |
+| Deep Focus | Calm listening | Indigo/blue/violet, lower heat |
+| Lounge | Warmer listening | Amber/rose/violet |
+| Ambient | Spacious listening | Teal/violet/sky |
+| Weird Internet | Stranger stations | Magenta/red/violet |
 
 ## Tech Stack
 
@@ -59,7 +90,7 @@ Typography:
 - Axios loaded from CDN.
 - [Webpack 3][webpack] and Babel for the legacy source build.
 - Sass source styles in `src/scss/`.
-- `public/css/nightwave.css` as the currently loaded visible Nightwave override.
+- `public/css/nightwave.css` as the currently loaded visible CelluloidFM override.
 - Static hosting friendly: no backend is required.
 
 ## Project Structure
@@ -69,13 +100,13 @@ Typography:
 |-- index.html              # App shell and Vue template
 |-- README.md               # Project documentation
 |-- CNAME                   # Custom domain config, if used
-|-- package.json            # Legacy npm scripts and dependencies
+|-- `package.json            # Legacy npm scripts and dependencies
 |-- webpack.config.js       # Legacy Webpack 3 build config
 |-- public/
 |   |-- bundles/            # Existing compiled JS/CSS bundle
 |   |-- css/
 |   |   |-- fonts.css
-|   |   `-- nightwave.css   # Current visible Nightwave theme override
+|   |   `-- nightwave.css   # Current visible CelluloidFM theme override
 |   |-- fonts/              # Local font and icon assets
 |   |-- img/                # Background images
 |   `-- audio/              # Small audio assets
@@ -91,7 +122,7 @@ Typography:
     |   |-- filters.js      # Vue filters
     |   `-- utils.js        # Search and sort helpers
     `-- scss/               # Source Sass theme files
-```
+````
 
 ## Run Locally
 
@@ -107,7 +138,7 @@ Open:
 http://localhost:8000
 ```
 
-This works because the app is already static and loads the current Nightwave CSS override directly from `public/css/nightwave.css`.
+This works because the app is already static and loads the current CelluloidFM CSS override directly from `public/css/nightwave.css`.
 
 ## Legacy Build Commands
 
@@ -146,7 +177,7 @@ A future modernization pass should replace `node-sass` with `sass`, update Webpa
 | Goal | File |
 | --- | --- |
 | App structure and Vue template | `index.html` |
-| Current visible Nightwave styling | `public/css/nightwave.css` |
+| Current visible CelluloidFM styling | `public/css/nightwave.css` |
 | Source theme tokens and Sass styles | `src/scss/` |
 | Player state, favorites, routing, and controls | `src/app.js` |
 | SomaFM API handling | `src/js/soma.js` |
@@ -166,7 +197,9 @@ Before pushing changes, test these flows:
 - Volume control works.
 - Favorites can be toggled.
 - Favorites can be exported.
+- Mood buttons change the visual theme.
 - Recent tracks load.
+- YouTube search link appears for current track metadata.
 - The visualizer appears during playback.
 - Mobile layout remains usable.
 
@@ -176,7 +209,7 @@ Stage and commit your changes:
 
 ```bash
 git add .
-git commit -m "Update CelluloidFM README and Nightwave UI"
+git commit -m "Update CelluloidFM cinematic UI"
 ```
 
 Push to your GitHub repository:
